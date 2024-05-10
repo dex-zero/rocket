@@ -1,14 +1,24 @@
 import { Search, Ellipsis, ChevronsLeft, ChevronLeft, ChevronsRight, ChevronRight } from "lucide-react"
+import dayjs from 'dayjs'
+import 'dayjs/locale/pt-br'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { IconButton } from "./icon-button"
 import { Table } from "./table/table"
 import { TableHeader } from "./table/table-header"
 import { TableCell } from "./table/table-cell"
+import { ChangeEvent, useState } from "react"
+import { attendees } from "../data/attendees"
 
+dayjs.extend(relativeTime)
+dayjs.locale('pt-br')
 
 export function AttendeeList(){
 
-    function onSearchInputChanged(event) {
-        console.log(event?.target.value)
+    const [search, setSearch] = useState('')
+    const [page, setPage ] = useState(0)
+
+    function onSearchInputChanged(event: ChangeEvent <HTMLInputElement>) {
+        setSearch(event.target.value)
     }
 
     return(
@@ -20,6 +30,8 @@ export function AttendeeList(){
                     <Search className="size-4 text-emerald-200"/>
                     <input onChange={onSearchInputChanged} className="bg-transparent outline-none flex-1 border-0 p-0 text-sm" placeholder="Buscar Participante..." />
                 </div>
+
+                {search}
             </div>
 
             <Table>
@@ -36,21 +48,21 @@ export function AttendeeList(){
                     </tr>
                 </thead>
                 <tbody>
-                    {Array.from({ length: 10 }).map((_, i) => {
+                    {attendees.map((page * 10, (page + 1) * 10) => {
                         return(
-                            <tr key={i} className="border-b border-white/10 hover:bg-white/5">
+                            <tr key={attendees.id} className="border-b border-white/10 hover:bg-white/5">
                                 <TableCell>
                                     <input type="checkbox" className="size-4 rounded bg-black/20 border border-white/10" />
                                 </TableCell>
-                                <TableCell>12383</TableCell>
+                                <TableCell>{attendees.id}</TableCell>
                                 <TableCell>
                                     <div className="flex flex-col gap-1 ">
-                                        <span className="text-white font-semibold">Diego Schell Fernandes</span>
-                                        <span>diego@rocketseat.com.br</span>
+                                        <span className="text-white font-semibold">{attendees.name}</span>
+                                        <span>{attendees.email}</span>
                                     </div>
                                 </TableCell>
-                                <TableCell>7 dias atrás</TableCell>
-                                <TableCell>3 dias atrás</TableCell>
+                                <TableCell>{dayjs().to(attendees.createdAt)}</TableCell>
+                                <TableCell>{dayjs().to(attendees.checkedInAt)}</TableCell>
                                 <TableCell>
                                     <IconButton transparent>
                                         <Ellipsis className="size-4"/>
